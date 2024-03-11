@@ -1,0 +1,32 @@
+version: '3.1'
+
+services:
+
+  assets-management-db:
+    image: postgres:16-alpine
+    environment:
+        POSTGRES_USER: assets_user
+        POSTGRES_PASSWORD: assets_user
+        POSTGRES_DB: assets_management
+        PGDATA: /data/postgres
+    volumes:
+        - assets-management-db:/data/postgres
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+
+  assets-management-api:
+    build: .
+    restart: always
+    ports:
+      - "10000:10000"
+    environment:
+      - SPRING_PROFILES_ACTIVE=psql
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://assets-management-db:5432/assets_management
+    depends_on:
+      - assets-management-db
+
+volumes:
+    assets-management-db:
+
