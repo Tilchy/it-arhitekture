@@ -1,0 +1,62 @@
+version: '3.5'
+
+services:
+  postgres:
+    container_name: postgres_container_native
+    image: postgres
+    environment:
+      POSTGRES_USER: tracking_user
+      POSTGRES_PASSWORD: tracking_password
+      PGDATA: /data/postgres
+      POSTGRES_DB: tracking_management
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres-native
+    restart: unless-stopped
+
+  pgadmin:
+    container_name: pgadmin_container_native
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    ports:
+      - "10001:80"
+    networks:
+      - postgres-native
+    restart: unless-stopped
+
+  tracking-management:
+    container_name: tracking_management_native
+    build:
+      context: .
+      dockerfile: src/main/docker/Dockerfile.jvm
+    ports:
+      - "10000:8080"
+    networks:
+      - postgres-native
+    depends_on:
+      - postgres
+    environment:
+      QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://postgres:5432/tracking_management
+      QUARKUS_DATASOURCE_USERNAME: tracking_user
+      QUARKUS_DATASOURCE_PASSWORD: tracking_password
+    volumes:
+      - tracking_management:/deployments
+    restart: unless-stopped
+
+networks:
+  postgres-native:
+    name: postgres-native-network
+    driver: bridge
+
+volumes:
+  postgres:
+  pgadmin:
+  tracking_management:
