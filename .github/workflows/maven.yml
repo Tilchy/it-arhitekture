@@ -23,5 +23,5 @@ jobs:
         mvn test
     - name: Test TrackingManagementApi with Maven
       run: |
-        cd ../TrackingManagementApi
+        cd TrackingManagementApi
         mvn test
