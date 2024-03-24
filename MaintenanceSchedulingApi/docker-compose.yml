@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  activemq:
+    image: apache/activemq-artemis:2.33.0-alpine
+    container_name: activemq_container
+    ports:
+      - "5672:5672" # Expose the messaging port
+      - "8161:8161" # Expose the management console port
+      - "61616:61616"
+    environment:
+      ARTEMIS_USER: artemis
+      ARTEMIS_PASSWORD: artemis
+    networks:
+        - maintenance-network
+    volumes:
+      - activemq:/var/lib/artemis-instance # Persist data outside the container
+
+  postgres:
+    container_name: postgres_container
+    image: postgres:16-alpine3.19
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: user
+      PGDATA: /data/postgres
+      POSTGRES_DB: maintenance
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - maintenance-network
+    restart: unless-stopped
+
+  pgadmin:
+    container_name: pgadmin_container
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@pgadmin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    ports:
+      - "8888:80"
+    networks:
+      - maintenance-network
+    restart: unless-stopped
+
+  maintenance_api:
+    container_name: maintenance_api_container
+    build:
+      context: .
+      dockerfile: src/main/docker/Dockerfile.jvm
+    ports:
+      - "8080:8080"
+    networks:
+      - maintenance-network
+    depends_on:
+      - postgres
+      - activemq
+    environment:
+      QUARKUS_DATASOURCE_REACTIVE_URL: postgresql://postgres:5432/maintenance
+      QUARKUS_DATASOURCE_USERNAME: user
+      QUARKUS_DATASOURCE_PASSWORD: user
+    volumes:
+      - maintenance:/deployments
+    restart: unless-stopped
+
+networks:
+  maintenance-network:
+    driver: bridge
+
+volumes:
+  maintenance:
+  postgres:
+  pgadmin:
+  activemq:
