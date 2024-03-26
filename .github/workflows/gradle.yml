@@ -20,5 +20,7 @@ jobs:
       uses: gradle/gradle-build-action@v2
       with:
         working-directory: MaintenanceSchedulingApi
+    - name: Make gradlew executable
+      run: chmod +x ./gradlew
     - name: Run tests with Gradle
       run: ./gradlew test
