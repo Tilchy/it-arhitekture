@@ -19,7 +19,11 @@ jobs:
     - name: Setup Gradle
       uses: gradle/gradle-build-action@v2
       with:
-        working-directory: MaintenanceSchedulingApi
+        working-directory: ./MaintenanceSchedulingApi
+    - name: Init Gradle Wrapper
+      run: gradle wrapper
+    - name: Build with Gradle
+      run: gradle build
     - name: Make gradlew executable
       run: chmod +x ./gradlew
     - name: Run tests with Gradle
