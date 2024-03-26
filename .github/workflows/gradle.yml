@@ -17,6 +17,14 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
+    - name: Setup Gradle
+      working-directory: ./RestaurantManagementAPI
+      run: gradle wrapper
+
+    - name: Build with Gradle
+      working-directory: ./RestaurantManagementAPI
+      run: ./gradlew build --no-daemon
+
     - name: Make gradlew executable
       run: chmod +x ./gradlew
 
