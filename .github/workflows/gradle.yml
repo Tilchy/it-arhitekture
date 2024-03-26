@@ -17,10 +17,6 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
-    - name: Setup Gradle
-      working-directory: ./MaintenanceSchedulingApi
-      run: gradle wrapper
-
     - name: Make gradlew executable
       working-directory: ./MaintenanceSchedulingApi
       run: chmod +x ./gradlew
