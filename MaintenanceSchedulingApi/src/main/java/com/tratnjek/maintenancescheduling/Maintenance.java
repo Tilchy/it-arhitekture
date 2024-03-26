@@ -11,7 +11,6 @@ public class Maintenance extends PanacheEntity {
     public String name;
     public String description;
     public String location;
-    //public LocalDateTime scheduled;
     public String duration;
     public String status;
     public String type;
