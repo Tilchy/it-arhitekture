@@ -21,7 +21,7 @@ jobs:
       with:
         working-directory: ./MaintenanceSchedulingApi
     - name: Init Gradle Wrapper
-      run: gradle wrapper
+      run: gradle init
     - name: Build with Gradle
       run: gradle build
     - name: Make gradlew executable
