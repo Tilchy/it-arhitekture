@@ -1,0 +1,6 @@
+@ItArhitekture.Gateway_HostAddress = http://localhost:5018
+
+GET {{ItArhitekture.Gateway_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
