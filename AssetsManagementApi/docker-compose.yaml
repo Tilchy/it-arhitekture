@@ -12,7 +12,9 @@ services:
     volumes:
         - assets-management-db:/data/postgres
     ports:
-      - "5432:5432"
+      - "5433:5432"
+    networks:
+      - assets-network
     restart: unless-stopped
 
 
@@ -20,13 +22,22 @@ services:
     build: .
     restart: always
     ports:
-      - "10000:10000"
+      - "9042:9042"
     environment:
       - SPRING_PROFILES_ACTIVE=psql
       - SPRING_DATASOURCE_URL=jdbc:postgresql://assets-management-db:5432/assets_management
     depends_on:
       - assets-management-db
+    networks:
+      - assets-network
+      - shared-network
 
 volumes:
     assets-management-db:
+
+networks:
+    assets-network:
+      driver: bridge
+    shared-network:
+      external: true
 

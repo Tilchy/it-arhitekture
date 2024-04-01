@@ -1,7 +1,7 @@
-version: '3.8'
+version: '3.9'
 
 services:
-  activemq:
+  maintenance-mq:
     image: apache/activemq-artemis:2.33.0-alpine
     container_name: activemq_container
     ports:
@@ -16,7 +16,7 @@ services:
     volumes:
       - activemq:/var/lib/artemis-instance # Persist data outside the container
 
-  postgres:
+  maintenance-db:
     container_name: postgres_container
     image: postgres:16-alpine3.19
     environment:
@@ -47,20 +47,21 @@ services:
       - maintenance-network
     restart: unless-stopped
 
-  maintenance_api:
-    container_name: maintenance_api_container
+  maintenance-api:
+    container_name: maintenance-api-container
     build:
       context: .
       dockerfile: src/main/docker/Dockerfile.jvm
     ports:
-      - "8080:8080"
+      - "9044:9044"
     networks:
       - maintenance-network
+      - shared-network
     depends_on:
-      - postgres
-      - activemq
+      - maintenance-db
+      - maintenance-mq
     environment:
-      QUARKUS_DATASOURCE_REACTIVE_URL: postgresql://postgres:5432/maintenance
+      QUARKUS_DATASOURCE_REACTIVE_URL: postgresql://maintenance-db:5432/maintenance
       QUARKUS_DATASOURCE_USERNAME: user
       QUARKUS_DATASOURCE_PASSWORD: user
     volumes:
@@ -69,7 +70,8 @@ services:
 
 networks:
   maintenance-network:
-    driver: bridge
+  shared-network:
+    external: true
 
 volumes:
   maintenance:

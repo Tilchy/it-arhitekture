@@ -32,6 +32,7 @@ public class MaintenanceResource {
     }
 
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public Uni<List<Maintenance>> list() {
         logger.info("Listing all maintenance tasks");
         return Maintenance.listAll();
@@ -39,6 +40,8 @@ public class MaintenanceResource {
 
     @GET
     @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
     public Uni<Response> get(@PathParam("id") Long id) {
         logger.info("Getting a maintenance task");
 
@@ -49,6 +52,8 @@ public class MaintenanceResource {
     }
 
     @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     public Uni<Response> add(Maintenance maintenance) {
         logger.info("Adding a maintenance task");
 
@@ -73,6 +78,8 @@ public class MaintenanceResource {
 
     @PUT
     @Path("/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     public Uni<Response> update(@PathParam("id") Long id, Maintenance maintenance) {
         logger.info("Updating a maintenance task");
         return Maintenance.<Maintenance>findById(id)
@@ -80,7 +87,6 @@ public class MaintenanceResource {
                     m.name = maintenance.name;
                     m.description = maintenance.description;
                     m.location = maintenance.location;
-                    //m.scheduled = maintenance.scheduled;
                     m.duration = maintenance.duration;
                     m.status = maintenance.status;
                     m.type = maintenance.type;
@@ -93,6 +99,8 @@ public class MaintenanceResource {
 
     @DELETE
     @Path("/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     public Uni<Response> delete(@PathParam("id") Long id) {
         logger.info("Deleting a maintenance task");
         return Maintenance.<Maintenance>findById(id)
