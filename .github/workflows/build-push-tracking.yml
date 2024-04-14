@@ -36,5 +36,6 @@ jobs:
       - name: Build Docker image
         working-directory: ./TrackingManagementApi/src/main/docker
         run: |
-          docker build -f Dockerfile.jvm -t ${{ secrets.DOCKER_USERNAME }}/tracking-api:latest .
+          docker build -f Dockerfile.jvm -t quarkus/track-management-system-jvm .
+          docker tag quarkus/track-management-system-jvm ${{ secrets.DOCKER_USERNAME }}/tracking-api:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/tracking-api:latest
