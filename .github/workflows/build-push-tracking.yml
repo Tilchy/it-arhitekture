@@ -22,7 +22,7 @@ jobs:
       - name: Package TrackingApi with Maven
         working-directory: ./TrackingManagementApi
         run: |
-          ./mvnw package
+          mvn package
           
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
