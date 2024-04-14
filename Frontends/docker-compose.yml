@@ -1,0 +1,33 @@
+version: '3.9'
+services:
+  host-frontend:
+    build: ./host
+    ports:
+      - 8080:8080
+    networks:
+      - shared-network
+
+  maintenance-frontend:
+    build: ./maintenance-frontend
+    ports:
+      - 8081:8081
+    networks:
+      - shared-network
+
+  tracking-frontend:
+    build: ./tracking-frontend
+    ports:
+      - 8082:8082
+    networks:
+      - shared-network
+
+  asset-frontend:
+    build: ./assets-frontend
+    ports:
+      - 8083:8083
+    networks:
+      - shared-network
+
+networks:
+  shared-network:
+    external: true

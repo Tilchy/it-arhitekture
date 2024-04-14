@@ -1,0 +1,84 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "TaskGrpcClientProto";
+
+package task;
+
+service TaskGrpcService {
+  rpc AddTask (AddTaskRequest) returns (AddTaskResponse) {}
+  rpc GetTask (GetTaskRequest) returns (GetTaskResponse) {}
+  rpc UpdateTask (UpdateTaskRequest) returns (UpdateTaskResponse) {}
+  rpc DeleteTask (DeleteTaskRequest) returns (DeleteTaskResponse) {}
+  rpc ListTasks (ListTaskRequest) returns (ListTaskResponse) {}
+}
+
+message AddTaskRequest {
+  string name = 1;
+  string description = 2;
+  string category = 3;
+  string status = 4;
+  int32 priority = 5;
+}
+
+message AddTaskResponse {
+  bool success = 2;
+  optional string message = 3;
+}
+
+message GetTaskRequest {
+  string id = 1;
+}
+
+message GetTaskResponse {
+  string name = 1;
+  string description = 2;
+  string category = 3;
+  string status = 4;
+  int32 priority = 5;
+  optional bool success = 6;
+  optional string message = 7;
+}
+
+message UpdateTaskRequest {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string category = 4;
+  string status = 5;
+  int32 priority = 6;
+}
+
+message UpdateTaskResponse {
+  bool success = 7;
+  optional string message = 8;
+}
+
+message DeleteTaskRequest {
+  string id = 1;
+}
+
+message DeleteTaskResponse {
+  bool success = 2;
+  string message = 3;
+}
+
+message ListTaskRequest {
+  string category = 1;
+  optional string status = 2;
+  optional int32 priority = 3;
+}
+
+message ListTaskResponse {
+  repeated TaskItem tasks = 1;
+  optional bool success = 2;
+  optional string message = 3;
+}
+
+message TaskItem {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string category = 4;
+  string status = 5;
+  int32 priority = 6;
+}

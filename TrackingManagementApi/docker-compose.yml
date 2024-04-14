@@ -32,7 +32,7 @@ services:
       - postgres-native
     restart: unless-stopped
 
-  tracking-management:
+  tracking-management-grpc:
     container_name: tracking_management_native
     build:
       context: .
@@ -42,6 +42,7 @@ services:
       - "9000:9000"
     networks:
       - postgres-native
+      - shared-network
     depends_on:
       - postgres
     environment:
@@ -56,6 +57,8 @@ networks:
   postgres-native:
     name: postgres-native-network
     driver: bridge
+  shared-network:
+    external: true
 
 volumes:
   postgres:
