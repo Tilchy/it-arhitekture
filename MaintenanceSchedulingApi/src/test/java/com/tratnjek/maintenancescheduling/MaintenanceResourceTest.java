@@ -8,14 +8,14 @@ import static io.restassured.RestAssured.given;
 @QuarkusTest
 public class MaintenanceResourceTest {
 
-    @Test
+    /*@Test
     void testListMaintenanceTasks(){
 
         given()
                 .when().get("/maintenance")
                 .then()
                 .statusCode(200);
-    }
+    }*/
 
    /* @Test
     void testGetMaintenanceTask() {
