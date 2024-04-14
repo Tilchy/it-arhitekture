@@ -12,15 +12,15 @@ jobs:
       matrix:
         include:
           - context: AssetsManagementApi
-            image_name: tilchy/it-arhitekture:assets-management-api
+            image_name: tilchy/it-arhitekture
           - context: ItArhitekture.Gateway
-            image_name: tilchy/it-arhitekture:gateway
+            image_name: tilchy/it-arhitekture
           - context: MaintenanceSchedulingApi
-            image_name: tilchy/it-arhitekture:maintenance-scheduling-api
+            image_name: tilchy/it-arhitekture
           - context: MobileGateway
-            image_name: tilchy/it-arhitekture:mobile-gateway
+            image_name: tilchy/it-arhitekture
           - context: TrackingManagementApi
-            image_name: tilchy/it-arhitekture:tracking-management-api
+            image_name: tilchy/it-arhitekture
 
     steps:
       - name: Check out the repo
