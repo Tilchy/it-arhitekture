@@ -36,5 +36,6 @@ jobs:
       - name: Build Docker image
         working-directory: ./MaintenanceSchedulingApi/src/main/docker
         run: |
-          docker build -f Dockerfile.jvm -t quarkus/maintenance-scheduling-jvm:latest .
-          docker push ${{ secrets.DOCKER_USERNAME }}/maintenance:latest
+          docker build -f Dockerfile.jvm -t quarkus/maintenance-scheduling-jvm .
+          docker tag quarkus/maintenance-scheduling-jvm ${{ secrets.DOCKER_USERNAME }}/maintenance-api:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/maintenance-api:latest
