@@ -34,7 +34,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Docker image
-        working-directory: ./TrackingManagementApi
+        working-directory: ./TrackingManagementApi/src/main/docker
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/tracking-api:latest .
+          docker build -f Dockerfile.jvm -t ${{ secrets.DOCKER_USERNAME }}/tracking-api:latest .
           docker push ${{ secrets.DOCKER_USERNAME }}/tracking-api:latest
