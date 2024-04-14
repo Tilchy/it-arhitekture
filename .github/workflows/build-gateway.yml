@@ -13,4 +13,4 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
-      run: docker build ./ItArhitekture.Gateway --file Dockerfile --tag ItArhitekture.Gateway:$(date +%s)
+      run: docker build ./ItArhitekture.Gateway --file Dockerfile --tag gateway:$(date +%s)
