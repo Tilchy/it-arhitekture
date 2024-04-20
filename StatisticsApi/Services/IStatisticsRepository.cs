@@ -1,11 +1,11 @@
 ﻿using StatisticsApi.Models;
-
+using ErrorOr;
 namespace StatisticsApi.Services;
 
 public interface IStatisticsRepository
 {
-	Task<EndpointModel> GetLastCalledEndpoint();
-	Task<EndpointModel> GetMostCalledEndpoint();
-	Task<List<EndpointModel>> GetCallsPerEndpoint();
-	Task<EndpointModel> UpdateCalledEndpoint(EndpointModel endpoint);
+	ErrorOr<EndpointModel> GetLastCalledEndpoint();
+	ErrorOr<EndpointModel> GetMostCalledEndpoint();
+	ErrorOr<List<EndpointModel>> GetCallsPerEndpoint();
+	ErrorOr<EndpointModel> UpdateCalledEndpoint(EndpointModel? endpoint);
 }

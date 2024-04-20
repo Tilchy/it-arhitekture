@@ -1,6 +1,11 @@
-﻿namespace StatisticsApi.Services;
+using StatisticsApi.Models;
+using ErrorOr;
+namespace StatisticsApi.Services;
 
-public class IStatisticsServiceHandler
+public interface IStatisticsServiceHandler
 {
-	
+    ErrorOr<EndpointModel> GetLastCalledEndpoint();
+    ErrorOr<EndpointModel> GetMostCalledEndpoint();
+    ErrorOr<List<EndpointModel>> GetCallsPerEndpoint();
+    ErrorOr<EndpointModel> UpdateCalledEndpoint(EndpointModel? endpoint);
 }

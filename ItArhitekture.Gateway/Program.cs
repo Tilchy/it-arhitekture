@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using AspNetCore.Proxy;
 using Grpc.Net.Client;
+using ItArhitekture.Gateway;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -53,6 +54,8 @@ app.UseRouting();
 
 app.UseAuthentication(); // Make sure this is placed after UseRouting and before UseAuthorization
 app.UseAuthorization();
+
+app.UseMiddleware<StatisticsMiddleware>();
 
 // Add token authorization
 app.MapGet("/", () => "Hi from the proxy!");

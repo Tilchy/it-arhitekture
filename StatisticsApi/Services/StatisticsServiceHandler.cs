@@ -1,64 +1,72 @@
-﻿using StatisticsApi.Models;
+﻿using ErrorOr;
+using StatisticsApi.Models;
 
 namespace StatisticsApi.Services;
 
-public class StatisticsServiceHandler(
-	IStatisticsRepository statisticsRepository,
-	ILogger<StatisticsServiceHandler> logger)
+public class StatisticsServiceHandler: IStatisticsServiceHandler
 {
-	public  Task<EndpointModel> GetLastCalledEndpoint()
+	private readonly IStatisticsRepository _statisticsRepository;
+	private readonly ILogger<StatisticsServiceHandler> _logger;
+	
+	public StatisticsServiceHandler(IStatisticsRepository statisticsRepository, ILogger<StatisticsServiceHandler> logger)
+	{
+		_statisticsRepository = statisticsRepository;
+		_logger = logger;
+	}
+	
+	public ErrorOr<EndpointModel> GetLastCalledEndpoint()
 	{
 		try
 		{
-			return statisticsRepository.GetLastCalledEndpoint();
+			return _statisticsRepository.GetLastCalledEndpoint();
 		}
 		catch (Exception ex)
 		{
-			logger.LogError(ex, "Error while getting last called endpoint");
-			return null!;
+			_logger.LogError(ex, "Error while getting last called endpoint");
+			return Error.Unexpected();
 		}
 
 	}
 
-	public Task<EndpointModel> GetMostCalledEndpoint()
+	public ErrorOr<EndpointModel> GetMostCalledEndpoint()
 	{
 		try
 		{
-			return statisticsRepository.GetMostCalledEndpoint();
+			return _statisticsRepository.GetMostCalledEndpoint();
 		}
 		catch (Exception ex)
 		{
-			logger.LogError(ex, "Error while getting most called endpoint");
-			return null!;
+			_logger.LogError(ex, "Error while getting most called endpoint");
+			return Error.Unexpected();
 		}
 	}
-	public  Task<List<EndpointModel>> GetCallsPerEndpoint()
+	public  ErrorOr<List<EndpointModel>> GetCallsPerEndpoint()
 	{
 		try
 		{
-			return  statisticsRepository.GetCallsPerEndpoint();
+			return  _statisticsRepository.GetCallsPerEndpoint();
 		}
 		catch (Exception ex)
 		{
-			logger.LogError(ex, "Error while getting calls per endpoint");
-			return null!;
+			_logger.LogError(ex, "Error while getting calls per endpoint");
+			return Error.Unexpected();
 		}
 	}
-	public Task<EndpointModel> UpdateCalledEndpoint(EndpointModel? endpoint)
+	public ErrorOr<EndpointModel> UpdateCalledEndpoint(EndpointModel? endpoint)
 	{
 		if (endpoint == null || string.IsNullOrEmpty(endpoint.Endpoint))
 		{
-			logger.LogError("Endpoint is null or name is null or empty");
-			return null!;
+			_logger.LogError("Endpoint is null or name is null or empty");
+			return Error.Validation();
 		}
 		try
 		{
-			return  statisticsRepository.UpdateCalledEndpoint(endpoint); ;
+			return  _statisticsRepository.UpdateCalledEndpoint(endpoint); ;
 		}
 		catch (Exception ex)
 		{
-			logger.LogError(ex, "Error while updating called endpoint");
-			return null!;
+			_logger.LogError(ex, "Error while updating called endpoint");
+			return Error.Unexpected();
 		}
 	}
 }

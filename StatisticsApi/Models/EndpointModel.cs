@@ -2,7 +2,7 @@
 
 public class EndpointModel
 {
-	public string? Id { get; set; }
+	public Guid? Id { get; set; }
 	public string? Endpoint { get; set; }
 	public int Calls { get; set; }
 	public DateTime LastCalled { get; set; }

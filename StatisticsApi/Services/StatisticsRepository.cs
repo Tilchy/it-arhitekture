@@ -1,4 +1,5 @@
-﻿using StatisticsApi.Models;
+﻿using ErrorOr;
+using StatisticsApi.Models;
 
 namespace StatisticsApi.Services;
 
@@ -6,64 +7,89 @@ public class StatisticsRepository(ILogger<StatisticsRepository> logger) : IStati
 {
     private readonly List<EndpointModel> _statisticsCollection = new();
 
-    public Task<EndpointModel> GetLastCalledEndpoint()
+    public ErrorOr<EndpointModel> GetLastCalledEndpoint()
     {
         try
         {
-            return Task.FromResult(_statisticsCollection.MaxBy(e => e.LastCalled));
+            var result = _statisticsCollection.MaxBy(e => e.LastCalled);
+
+            if (result == null)
+            {
+                return Error.NotFound();
+            }
+        
+            return result;
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error while getting last called endpoint");
-            return Task.FromResult<EndpointModel>(null);
-        }
+            logger.LogError(ex, "Error while getting last called endpoint.");
+            return Error.Unexpected(); 
+        }   
+            
     }
 
-    public Task<EndpointModel> GetMostCalledEndpoint()
+    public ErrorOr<EndpointModel> GetMostCalledEndpoint()
     {
         try
         {
-            return Task.FromResult(_statisticsCollection.MaxBy(e => e.Calls));
+            var result = _statisticsCollection.MaxBy(e => e.Calls);
+
+            if (result == null)
+            {
+                return Error.NotFound();
+            }
+
+            return result;
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error while getting most called endpoint");
-            return Task.FromResult<EndpointModel>(null); // Return null as per the original logic
+            return Error.Unexpected(); 
         }
     }
     
     
-    public Task<List<EndpointModel>> GetCallsPerEndpoint()
+    public ErrorOr<List<EndpointModel>> GetCallsPerEndpoint()
     {
         try
         {
-            return Task.FromResult(_statisticsCollection.ToList());
+            return _statisticsCollection.ToList();
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error while getting calls per endpoint");
-            return Task.FromResult(new List<EndpointModel>()); // Return an empty list instead of null
+            return Error.Unexpected();
         }
     }
-    public Task<EndpointModel> UpdateCalledEndpoint(EndpointModel endpoint)
+    public ErrorOr<EndpointModel> UpdateCalledEndpoint(EndpointModel? endpoint)
     {
-        if (endpoint == null || string.IsNullOrEmpty(endpoint.Endpoint))
+        try
         {
-            throw new ArgumentNullException(nameof(endpoint));
-        }
+            if (endpoint == null || string.IsNullOrEmpty(endpoint.Endpoint))
+            {
+                return Error.Validation();
+            }
 
-        var existingEndpoint = _statisticsCollection.FirstOrDefault(e => e.Endpoint == endpoint.Endpoint);
-        if (existingEndpoint != null)
-        {
-            existingEndpoint.Calls++;
-            existingEndpoint.LastCalled = DateTime.UtcNow;
-        }
-        else
-        {
-            _statisticsCollection.Add(endpoint);
-        }
+            var existingEndpoint = _statisticsCollection.FirstOrDefault(e => e.Endpoint == endpoint.Endpoint);
+            if (existingEndpoint != null)
+            {
+                existingEndpoint.Calls++;
+                existingEndpoint.LastCalled = DateTime.UtcNow;
+            }
+            else
+            {
+                endpoint.Id = Guid.NewGuid();
+                endpoint.Calls++;
+                endpoint.LastCalled = DateTime.UtcNow;    
+                _statisticsCollection.Add(endpoint);
+            }
 
-        return Task.FromResult(existingEndpoint ?? endpoint);
-    
+            return existingEndpoint ?? endpoint;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error while updating called endpoint");
+            return Error.Unexpected();
+        }
     }
 }

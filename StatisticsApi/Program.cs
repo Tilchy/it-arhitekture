@@ -1,34 +1,43 @@
+using ErrorOr;
+using Microsoft.AspNetCore.Mvc;
+using StatisticsApi.Models;
+using StatisticsApi.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddLogging();
+builder.Services.AddHealthChecks();
+
+builder.Services.AddSingleton<IStatisticsServiceHandler, StatisticsServiceHandler>();
+builder.Services.AddSingleton<IStatisticsRepository, StatisticsRepository>();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-	app.UseSwagger();
-	app.UseSwaggerUI();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
-
-app.MapGet("statistics/last-called-endpoint", async (IStatisticsServiceHandler statisticsService) =>
+app.MapGet("last-called-endpoint", (IStatisticsServiceHandler serviceHandler) =>
 {
     try
     {
-        var result = await statisticsService.GetLastCalledEndpointAsync();
-
-        if (result == null)
+        var result = serviceHandler.GetLastCalledEndpoint();
+        
+        if (result.IsError)
         {
-            return Results.NotFound();
+            return Results.BadRequest(result.Errors);
         }
 
-        return Results.Ok(result);
-
-    }catch(Exception ex)
+        return Results.Ok(result.Value);
+    }
+    catch (Exception ex)
     {
         return Results.BadRequest(ex.Message);
     }
@@ -36,73 +45,80 @@ app.MapGet("statistics/last-called-endpoint", async (IStatisticsServiceHandler s
 .WithName("GetLastCalledEndpoint")
 .WithOpenApi();
 
-app.MapGet("statistics/most-called-endpoint", async (IStatisticsServiceHandler statisticsService) =>
-{
-    try
-    {
-        var result = await statisticsService.GetMostCalledEndpointAsnyc();
 
-        if (result == null)
+app.MapGet("most-called-endpoint", (IStatisticsServiceHandler statisticsService) =>
+    {
+        try
         {
-            return Results.NotFound();
+            var result = statisticsService.GetMostCalledEndpoint();
+
+            if (result.IsError)
+            {
+                return Results.BadRequest(result.Errors);
+            }
+
+            return Results.Ok(result.Value);
+        }
+        catch (Exception ex)
+        {
+            return Results.BadRequest(ex.Message);
+        }
+    })
+    .WithName("GetMostCalledEndpoint")
+    .WithOpenApi();
+
+app.MapGet("calls-per-endpoint", (IStatisticsServiceHandler statisticsService) =>
+    {
+        try
+        {
+            var result = statisticsService.GetCallsPerEndpoint();
+
+            if (result.IsError)
+            {
+                return Results.BadRequest(result.Errors);
+            }
+
+            return Results.Ok(result.Value);
+        }
+        catch (Exception ex)
+        {
+            return Results.BadRequest(ex.Message);
         }
 
-        return Results.Ok(result);
+    })
+    .WithName("GetCallsPerEndpoint")
+    .WithOpenApi();
 
-    }catch(Exception ex)
+
+app.MapPost("/endpoint", (IStatisticsServiceHandler statisticsService, [FromBody] string endpoint) =>
     {
-        return Results.BadRequest(ex.Message);
-    }
-})
-.WithName("GetMostCalledEndpoint")
-.WithOpenApi();
-
-app.MapGet("statistics/calls-per-endpoint", async (IStatisticsServiceHandler statisticsService) =>
-{
-    try
-    {
-        var result = await statisticsService.GetCallsPerEndpointAsync();
-
-        if (result == null)
+        try
         {
-            return Results.NotFound();
+            if (string.IsNullOrWhiteSpace(endpoint))
+            {
+                return Results.BadRequest(Error.Validation());
+            }
+            
+            var endpointModel = new EndpointModel
+            {
+                Endpoint = endpoint
+            };
+
+            var result = statisticsService.UpdateCalledEndpoint(endpointModel);
+
+            if (result.IsError)
+            {
+                return Results.BadRequest(result.Errors);
+            }
+            return Results.Ok(result.Value);
         }
-
-        return Results.Ok(result);
-
-    }catch(Exception ex)
-    {
-        return Results.BadRequest(ex.Message);
-    }
-
-})
-.WithName("GetCallsPerEndpoint")
-.WithOpenApi();
-
-app.MapPost("statistics/endpoint", async (IStatisticsServiceHandler statisticsService, EndpointDto endpoint) =>
-{
-    try
-    {
-        var endpointModel = new EndpointModel
+        catch (Exception ex)
         {
-            Endpoint = endpoint.Endpoint,
-            LastCalled = endpoint.LastCalled
-        };
-
-        var result = await statisticsService.UpdateCalledEndpointAsync(endpointModel);
-
-        if (result == null)
-        {
-            return Results.NotFound();
+            return Results.BadRequest(ex.Message);
         }
-        return Results.Ok(result);
+    })
+    .WithName("PostEndpointStatisticToDatabase")
+    .WithOpenApi();
 
-    }catch(Exception ex)
-    {
-        return Results.BadRequest(ex.Message);
-    }
-})
-.WithName("PostEndpointStatisticToDatabase")
-.WithOpenApi();
 
 app.Run();
